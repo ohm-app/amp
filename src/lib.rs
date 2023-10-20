@@ -1,3 +1,5 @@
+mod types;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
@@ -9,14 +11,6 @@ mod tests {
     use btleplug::api::{Central, Manager as _, ScanFilter};
     use btleplug::platform::Manager;
     use tokio::time;
-
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 
     #[tokio::test]
     async fn test_bluetooth() {
