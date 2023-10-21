@@ -12,7 +12,11 @@ find out more about the protocol.
 
 **Ambient Sound Control**
 
-The words marked as `---- ---- ----` change on every request. Perhaps they are a counter or a nonce.
+> [!NOTE]
+> The words marked as `---- ---- ----` change on every request. Perhaps they are a counter or a nonce.
+`000000X0` is the payload number in case of split packets. Packets over 16 bytes are split into
+multiple packets.
+
 
 | Action                  | Type          | Handle | Length | Payload                                               |
 | ----------------------- | ------------- | ------ | ------ | ----------------------------------------------------- |
