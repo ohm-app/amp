@@ -30,4 +30,4 @@ None yet.
 
 ## License
 
-amp does not provide a license yet. However, it will be likely be licensed under the MIT, Apache 2.0, GPL-3.0 or BSD 3-Clause license, or any valid combination of those licenses. I just haven't gotten around to doing that yet.
+amp is provided to you under the GPL-3.0 license. See "LICENSE" for more information.
