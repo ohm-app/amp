@@ -1,3 +1,25 @@
+use btleplug::api::{Central, Manager as _, ScanFilter};
+use btleplug::platform::Adapter;
+
+pub struct Manager {
+    manager: btleplug::platform::Manager,
+    pub adapters: Vec<Adapter>,
+}
+
+impl Manager {
+    pub async fn new() -> Self {
+        let manager = match btleplug::platform::Manager::new().await {
+            Ok(m) => m,
+            Err(e) => {
+                log::error!("Manager could not be instantiated: {}", e);
+                panic!()
+            }
+        };
+        let adapters = manager.adapters().await.unwrap();
+        Manager { manager, adapters }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::time::Duration;
