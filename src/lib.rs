@@ -15,7 +15,13 @@ impl Manager {
                 panic!()
             }
         };
-        let adapters = manager.adapters().await.unwrap();
+        let adapters = match manager.adapters().await {
+            Ok(a) => a,
+            Err(e) => {
+                log::error!("Adapters could not be initialized: {}", e);
+                panic!()
+            }
+        };
         Manager { manager, adapters }
     }
 }
