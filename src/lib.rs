@@ -9,6 +9,7 @@ pub struct Manager {
 
 impl Manager {
     pub async fn new() -> Result<Self, Error> {
+        log::trace!("Manager: Creating btleplug::platform::Manager...");
         let manager = match btleplug::platform::Manager::new().await {
             Ok(m) => m,
             Err(e) => {
@@ -16,6 +17,7 @@ impl Manager {
                 return Err(e);
             }
         };
+        log::trace!("Instantialted bleplug::platform::Manager: {:?}", manager);
         let adapters = match manager.adapters().await {
             Ok(a) => a,
             Err(e) => {
@@ -23,7 +25,38 @@ impl Manager {
                 return Err(e);
             }
         };
+        log::trace!("Adapters: {:?}", adapters);
         Ok(Manager { manager, adapters })
+    }
+
+    pub async fn scan(
+        &self,
+        filter: Option<ScanFilter>,
+        timeout: u64,
+        adapter: Adapter,
+    ) -> Vec<btleplug::platform::Peripheral> {
+        log::trace!(
+            "Starting scan on {}...",
+            adapter.adapter_info().await.unwrap()
+        );
+        tokio::spawn(async move {
+            adapter
+                .start_scan(filter.unwrap_or_default())
+                .await
+                .expect("Can't scan BLE adapter for connected devices...");
+            tokio::time::sleep(tokio::time::Duration::from_secs(timeout)).await;
+            let peripherals = adapter
+                .peripherals()
+                .await
+                .expect("Failed to get peripherals.");
+            adapter
+                .stop_scan()
+                .await
+                .expect("An error occurred while stopping the scan.");
+            peripherals
+        })
+        .await
+        .expect("Failed to complete scan.")
     }
 }
 
