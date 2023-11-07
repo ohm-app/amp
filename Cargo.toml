@@ -1,5 +1,5 @@
 [package]
-name = "ohm-amp"
+name = "ohm_amp"
 version = "0.1.0"
 edition = "2021"
 
