@@ -1,20 +1,22 @@
+pub mod error;
+
 use btleplug::api::{Central, Manager as _, ScanFilter};
 use btleplug::platform::Adapter;
-use btleplug::Error;
+use error::{AmpError, AmpResult};
 
-pub struct Manager {
+pub struct BluetoothManager {
     manager: btleplug::platform::Manager,
     pub adapters: Vec<Adapter>,
 }
 
-impl Manager {
-    pub async fn new() -> Result<Self, Error> {
+impl BluetoothManager {
+    pub async fn new() -> AmpResult<Self> {
         log::trace!("Manager: Creating btleplug::platform::Manager...");
         let manager = match btleplug::platform::Manager::new().await {
             Ok(m) => m,
             Err(e) => {
                 log::error!("Manager could not be instantiated: {}", e);
-                return Err(e);
+                return Err(AmpError::Bluetooth(e));
             }
         };
         log::trace!("Instantialted bleplug::platform::Manager: {:?}", manager);
@@ -22,11 +24,11 @@ impl Manager {
             Ok(a) => a,
             Err(e) => {
                 log::error!("Adapters could not be initialized: {}", e);
-                return Err(e);
+                return Err(AmpError::Bluetooth(e));
             }
         };
         log::trace!("Adapters: {:?}", adapters);
-        Ok(Manager { manager, adapters })
+        Ok(BluetoothManager { manager, adapters })
     }
 
     pub async fn scan(
@@ -34,12 +36,12 @@ impl Manager {
         filter: Option<ScanFilter>,
         timeout: u64,
         adapter: Adapter,
-    ) -> Vec<btleplug::platform::Peripheral> {
+    ) -> AmpResult<Vec<btleplug::platform::Peripheral>> {
         log::trace!(
             "Starting scan on {}...",
             adapter.adapter_info().await.unwrap()
         );
-        tokio::spawn(async move {
+        match tokio::spawn(async move {
             adapter
                 .start_scan(filter.unwrap_or_default())
                 .await
@@ -56,7 +58,10 @@ impl Manager {
             peripherals
         })
         .await
-        .expect("Failed to complete scan.")
+        {
+            Ok(o) => Ok(o),
+            Err(e) => Err(AmpError::Thread(e)),
+        }
     }
 }
 
@@ -64,13 +69,13 @@ impl Manager {
 mod tests {
     use std::time::Duration;
 
-    use crate::Manager;
+    use crate::BluetoothManager;
     use btleplug::api::{Central, ScanFilter};
     use tokio::time;
 
     #[tokio::test]
     async fn test_bluetooth() {
-        let manager = Manager::new().await.unwrap();
+        let manager = BluetoothManager::new().await.unwrap();
         let adapter_list = manager.adapters;
         if adapter_list.is_empty() {
             eprintln!("No Bluetooth adapters found");

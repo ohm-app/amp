@@ -12,4 +12,5 @@ crate-type = ["staticlib", "lib", "cdylib"]
 btleplug = "0.11.1"
 libc = "0.2.149"
 log = "0.4.20"
+thiserror = "1.0.50"
 tokio = { version = "1.33.0", features = ["macros", "rt"] }
