@@ -4,6 +4,7 @@ use btleplug::api::{Central, Manager as _, ScanFilter};
 use btleplug::platform::Adapter;
 use error::{AmpError, AmpResult};
 
+#[allow(dead_code)]
 pub struct BluetoothManager {
     manager: btleplug::platform::Manager,
     pub adapters: Vec<Adapter>,
