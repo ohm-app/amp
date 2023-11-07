@@ -1,8 +1,7 @@
+use super::{power::BatteryType, AmbientSound};
 use crate::error::AmpResult;
 
-use super::{power::BatteryType, AmbientSound};
-
-pub(crate) trait Device {
+pub trait Device {
     fn battery_level(&self) -> AmpResult<BatteryType>;
     fn name(&self) -> &'static str;
 }
