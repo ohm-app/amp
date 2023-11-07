@@ -1,4 +1,6 @@
 pub mod power {
+    #[cfg_attr(feature = "strum_derive", derive(strum_macros::Display))]
+    #[cfg_attr(feature = "serde_derive", derive(serde::Serialize, serde::Deserialize))]
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
     pub enum BatteryState {
         Charging(u8),
