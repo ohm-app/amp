@@ -41,27 +41,14 @@ impl BluetoothManager {
             "Starting scan on {}...",
             adapter.adapter_info().await.unwrap()
         );
-        match tokio::spawn(async move {
-            adapter
-                .start_scan(filter.unwrap_or_default())
-                .await
-                .expect("Can't scan BLE adapter for connected devices...");
+        tokio::spawn(async move {
+            adapter.start_scan(filter.unwrap_or_default()).await?;
             tokio::time::sleep(tokio::time::Duration::from_secs(timeout)).await;
-            let peripherals = adapter
-                .peripherals()
-                .await
-                .expect("Failed to get peripherals.");
-            adapter
-                .stop_scan()
-                .await
-                .expect("An error occurred while stopping the scan.");
-            peripherals
+            let peripherals = adapter.peripherals().await?;
+            adapter.stop_scan().await.map_err(AmpError::Bluetooth)?;
+            Ok(peripherals)
         })
-        .await
-        {
-            Ok(o) => Ok(o),
-            Err(e) => Err(AmpError::Thread(e)),
-        }
+        .await?
     }
 }
 
