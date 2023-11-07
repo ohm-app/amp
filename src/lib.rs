@@ -54,16 +54,13 @@ impl BluetoothManager {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-
     use crate::BluetoothManager;
-    use btleplug::api::{Central, ScanFilter};
-    use tokio::time;
+    use btleplug::api::Central;
 
     #[tokio::test]
     async fn test_bluetooth() {
         let manager = BluetoothManager::new().await.unwrap();
-        let adapter_list = manager.adapters;
+        let adapter_list = &manager.adapters;
         if adapter_list.is_empty() {
             eprintln!("No Bluetooth adapters found");
         }
@@ -72,12 +69,7 @@ mod tests {
                 "Starting scan on {}...",
                 adapter.adapter_info().await.unwrap()
             );
-            adapter
-                .start_scan(ScanFilter::default())
-                .await
-                .expect("Can't scan BLE adapter for connected devices...");
-            time::sleep(Duration::from_secs(10)).await;
-            let peripherals = adapter.peripherals().await.unwrap();
+            let peripherals = manager.scan(None, 10, adapter.clone()).await.unwrap();
             if peripherals.is_empty() {
                 eprintln!("->>> BLE peripheral devices were not found, sorry. Exiting...");
             } else {
