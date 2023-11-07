@@ -3,16 +3,23 @@ name = "ohm-amp"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+derive = ["serde_derive", "strum_derive"]
+serde_derive = ["dep:serde"]
+strum_derive = ["dep:strum", "dep:strum_macros"]
+
 [lib]
 crate-type = ["staticlib", "lib", "cdylib"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 btleplug = "0.11.1"
-libc = "0.2.149"
 log = "0.4.20"
-strum = { version = "0.25.0", features = ["derive", "strum_macros"] }
-strum_macros = "0.25.3"
+macro_rules_attribute = "0.2.0"
+serde = { version = "1.0.192", features = ["derive"], optional = true }
+strum = { version = "0.25.0", features = [
+    "derive",
+    "strum_macros",
+], optional = true }
+strum_macros = { version = "0.25.3", optional = true }
 thiserror = "1.0.50"
 tokio = { version = "1.33.0", features = ["macros", "rt"] }
